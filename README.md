@@ -36,7 +36,7 @@ Praticar os principais conceitos:
    2. Instale as dependências: pip install pandas numpy matplotlib seaborn
 
 ## Estrutura do projeto
-""" text
+```text
 projeto/ 
 |-- data/ 
 | |-- raw/                              # Dataset bruto gerado/baixado 
@@ -51,8 +51,8 @@ projeto/
 | |-- segmentacao_clientes.csv 
 | |-- estatisticas_gerais.json | 
 |-- graficos/ 
-|-- README.md """
-
+|-- README.md 
+```
 ## Ferramentas utilizadas 
 - Python 3.10+
 - Google Colab / VS Code
