@@ -36,7 +36,7 @@ Praticar os principais conceitos:
    2. Instale as dependências: pip install pandas numpy matplotlib seaborn
 
 ## Estrutura do projeto
-"""
+""" text
 projeto/ 
 |-- data/ 
 | |-- raw/                              # Dataset bruto gerado/baixado 
