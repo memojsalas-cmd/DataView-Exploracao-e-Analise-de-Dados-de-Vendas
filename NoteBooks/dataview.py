@@ -533,20 +533,30 @@ def exportar_resultados ( metricas , clientes , stats ):
   print ( "CSV exportado: outputs/metricas_por_mes.csv" )
   clientes.to_csv( "outputs/segmentacao_clientes.csv" , index= False , encoding= "utf-8-sig" )
   print ( "CSV exportado: outputs/segmentacao_clientes.csv" )
+  
+ #RF12 – Consolidar a Análise e Salvar o Dataset Final
+
+#1. Todas as etapas do Notebook já foram executadas
+#2. Esta célula salva o dataset final em data/final/
+#3. Decisão de versão: Escolhi df_v2 (outliers removidos) como base da análise final
+
+os.makedirs( "data/final" , exist_ok= True )
+df.to_csv( "data/final/vendas_final.csv" , index= False )
+print ( "Dataset final salvo em: data/final/vendas_final.csv" ) 
 
   # --- Exportação JSON ---
   # ensure_ascii=False permite gravar acentos como caracteres reais (ã, é)
   # round(float(v), 2) converte para float antes de arredondar,
   # evitando comportamento inesperado com o campo 'acima_da_media' (int).
-  stats_serializaveis = {k: round ( float (v), 2 ) for k, v in stats.items()}
-  caminho_json = "outputs/estatisticas_gerais.json"
-  with open (caminho_json, "w" , encoding= "utf-8" ) as f: json.dump(stats_serializaveis, f, indent= 2 , ensure_ascii= False )
+stats_serializaveis = {k: round ( float (v), 2 ) for k, v in stats.items()}
+caminho_json = "outputs/estatisticas_gerais.json"
+with open (caminho_json, "w" , encoding= "utf-8" ) as f: json.dump(stats_serializaveis, f, indent= 2 , ensure_ascii= False )
   # indent=2 formata o JSON com recuo de 2 espaços, mais legível que uma linha só
-  print ( f"JSON exportado: {caminho_json} " )
+print ( f"JSON exportado: {caminho_json} " )
   # --- Leitura de volta para confirmar ---
-  with open (caminho_json, encoding= "utf-8" ) as f: lido = json.load(f)
-  print ( "\nJSON lido de volta para confirmação:" )
-  print (json.dumps(lido, indent= 2 , ensure_ascii= False ))
+with open (caminho_json, encoding= "utf-8" ) as f: lido = json.load(f)
+print ( "\nJSON lido de volta para confirmação:" )
+print (json.dumps(lido, indent= 2 , ensure_ascii= False ))
 
 exportar_resultados(metricas, clientes, stats)
 
