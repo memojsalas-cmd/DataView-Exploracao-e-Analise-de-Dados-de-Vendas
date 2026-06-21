@@ -307,3 +307,51 @@ def calcular_metricas ( df ):
   return metricas
 
 metricas = calcular_metricas(df)
+
+##RF07 – Clientes segmentados por nível de Gastos.
+
+ #Critério de segmentação.
+
+#1.   Bronze: Abaixo de R$ 50.000
+#2.   Plata: R$ 75.000 a R$ 100.000
+#3.   Ouro: Acima de R$ 100.000
+
+def segmentar_clientes ( df ):
+  #""" Agrupa os dados por cliente, calcula o gasto total de cada um e classifica
+  #em Bronze / Prata / Ouro conforme os limites abaixo:
+  #< R$ 50.000 → Bronze
+  #R$ 75.000–R$ 100.000 → Prata
+  #> R$ 100.000 → Ouro
+  #Demonstra o uso de uma função lambda com condicional encadeado — equivalente a um if/elif/else em uma única expressão."""
+
+  # Soma a receita total de cada cliente em todas as suas compras
+  clientes_df = ( df.groupby( "cliente" )[ "receita_total" ] . sum () .reset_index() )
+  clientes_df.columns = [ "cliente" , "total_gasto" ]
+
+  # Lambda com ternário aninhado — como ler:
+  # "Se g > 100000 → 'Ouro'"
+  # "Senão, se g >= 75000 e g <= 100000 → 'Prata'"
+  # "Senão, se g < 50000 → 'Bronze'"
+  # "Senão → 'Indefinido' (para valores entre 50.000 e 75.000, ou igual a 50.000)"
+  clientes_df[ "segmento" ] = clientes_df[ "total_gasto" ].apply(
+      lambda g: "Ouro" if g > 100000
+      else ("Prata" if (g >= 75000 and g <= 100000)
+      else ("Bronze" if g < 750000 else "Indefinido"))
+  )
+  clientes_df = clientes_df.sort_values( "total_gasto" , ascending= False )
+  print ( "=== SEGMENTAÇÃO DE CLIENTES (Top 10) ===" )
+  print (clientes_df.head( 10 ).to_string(index= False ))
+  print ( f"\nDistribuição de segmentos:\n {clientes_df[ 'segmento' ].value_counts()} " )
+  return clientes_df
+
+clientes = segmentar_clientes(df)
+clientes.head()
+
+#Média de Gasto por Segmento
+
+media_gasto_por_segmento = clientes.groupby('segmento')['total_gasto'].mean().reset_index()
+media_gasto_por_segmento['total_gasto'] = media_gasto_por_segmento['total_gasto'].round(2)
+media_gasto_por_segmento = media_gasto_por_segmento.sort_values(by='total_gasto', ascending=False)
+
+print("\n=== MÉDIA DE GASTO POR SEGMENTO ===")
+print(media_gasto_por_segmento.to_string(index=False))
