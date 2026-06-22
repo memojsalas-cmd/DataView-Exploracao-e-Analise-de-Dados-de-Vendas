@@ -1,4 +1,6 @@
-# RF01 -Criação de um Data set de vendas com dados sintéticos / Gerar o dataset no código
+# RF01 -Criação de um Data set de vendas com dados sintéticos 
+# Gerar o dataset no código
+
 import pandas as pd 
 import numpy as np 
 import random 
@@ -8,8 +10,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns 
 from datetime import datetime, timedelta
 
-# Gera um dataset sintético de vendas com dados propositalmente sujos, incluindo valores nulos, 
-# strings sujas, datas inválidas e outliers. 
+# Gera um dataset sintético de vendas com dados propositalmente sujos, 
+# incluindo valores nulos, strings sujas, datas inválidas e outliers. 
+# 
 
 def gerar_dataset_vendas(n_registros= 500 , seed= 100):
   
@@ -29,6 +32,7 @@ def gerar_dataset_vendas(n_registros= 500 , seed= 100):
     data = data_inicio + timedelta(days=random.randint( 0 , 364 ))
 
     # Inserindo dados intencionalmente sujos para limpeza
+    
     if random.random() < 0.05 : quantidade = None # valor nulo
     if random.random() < 0.04 : preco = None # valor nulo
     if random.random() < 0.03 : produto = " " + produto # espaço extra (string suja)
@@ -47,10 +51,11 @@ df_bruto.to_csv( "data/raw/vendas.csv" , index= False )
 print (f"Dataset gerado com {len (df_bruto)} registros." )
 print (df_bruto.head())
 
-## RF02 – Inspecionar e Descrever os Dados
+## RF02 Inspecionar e Descrever os Dados
+
 def inspecionar_dados(df_bruto):
 
-    #Exibe informações básicas do DataFrame.
+    # Exibe informações básicas do DataFrame.
 
     print("\n=== INSPEÇÃO INICIAL DO DATASET ===")
     print(f"Shape: {df_bruto.shape}")
@@ -75,11 +80,11 @@ import os
 import pandas as pd
 
 def normalizar_texto(texto):
-    """
-    Limpa um valor de texto:
-    - troca qualquer sequencia de espacos por um unico espaco
-    - remove os espacos das pontas
-    """
+   
+    #Limpa um valor de texto:
+    #troca qualquer sequencia de espacos por um unico espaco
+    #remove os espacos das pontas
+   
     if pd.isna(texto):
         return texto
     texto = str(texto)
@@ -87,17 +92,17 @@ def normalizar_texto(texto):
     return texto.strip()                 # remove espacos das pontas
 
 def limpar_strings(df, colunas):
-    """Aplica a normalizacao de texto nas colunas indicadas."""
+    #Aplica a normalizacao de texto nas colunas indicadas.
+    
     df = df.copy()
     for coluna in colunas:
         df[coluna] = df[coluna].apply(normalizar_texto)
     return df
 
 def limpar_dados(df):
-    """
-    Limpa o DataFrame de vendas em etapas e devolve (df_limpo, relatorio).
-    O relatorio guarda quantas linhas cada etapa removeu, para mostrar o impacto.
-    """
+    # Limpa o DataFrame de vendas em etapas e devolve (df_limpo, relatorio).
+    # O relatorio guarda quantas linhas cada etapa removeu, para mostrar o impacto.
+    
     df = df.copy()
     relatorio = {}
     relatorio["registros_iniciais"] = len(df)
@@ -114,6 +119,7 @@ def limpar_dados(df):
 
     # Etapa 3: remover linhas sem cliente ou sem produto
     # Sem cliente ou produto nao é uma venda valida.
+    
     antes = len(df)
     df = df.dropna(subset=["cliente", "produto"])
     relatorio["nulos_removidos"] = antes - len(df)
@@ -121,6 +127,7 @@ def limpar_dados(df):
     # Etapa 4: remover devolucoes e precos invalidos
     # quantidade <= 0  -> devolucao / cancelamento
     # preco_unitario <= 0  -> ajuste contabil ou erro (nao é uma venda real)
+    
     antes = len(df)
     df = df[(df["quantidade"] > 0) & (df["preco_unitario"] > 0)]
     relatorio["devolucoes_e_precos_invalidos_removidos"] = antes - len(df)
@@ -139,17 +146,19 @@ def limpar_dados(df):
 
 # EXECUÇÃO: limpar o dataset bruto e salvar como versão v1 (com outliers)
 # Nesta versão os outliers são MANTIDOS — eles serão tratados na RF04.
+
 df_v1 , relatorio = limpar_dados ( df_bruto )
 os . makedirs ( "data/processed/v1_com_outliers" , exist_ok = True )
+
 # cria o diretório se não existir
 df_v1 . to_csv ( "data/processed/v1_com_outliers/vendas_v1.csv" , index = False )
 print ( "\nv1 salva em data/processed/v1_com_outliers/" )
 df_v1 . head ()
   
-##RF04 – Detectar e Tratar Outliers (versões v1 e v2)
+# RF04 – Detectar e Tratar Outliers (versões v1 e v2)
 
-#● v1_com_outliers/ — os dados limpos da RF03, com os outliers mantidos;
-#● v2_outliers_tratado/ — a mesma base da v1, agora com os outliers tratados (removidos ou substituídos).
+# v1_com_outliers/ — os dados limpos da RF03, com os outliers mantidos;
+# v2_outliers_tratado/ — a mesma base da v1, agora com os outliers tratados (removidos ou substituídos).
 
 def tratar_outliers ( df , colunas , fator = 1.5 , metodo = 'remover' ):
   #""" Trata outliers de colunas numéricas usando o Intervalo Interquartil (IQR).
@@ -264,10 +273,10 @@ df[[ "data_venda" , "receita_total" , "mes" , "trimestre" , "faixa_receita_item"
 #- Receita total por região.
 
 def calcular_metricas ( df ):
-  #""" Calcula e retorna um dicionário com métricas agregadas por quatro dimensões:
-   #mês, produto, categoria e região. Usa .groupby() + .agg() com nomeação explícita de colunas:
-  #nova_coluna=("coluna_origem", "função") Isso permite criar múltiplas agregações em uma única chamada
-  #e nomear cada resultado diretamente, sem precisar renomear depois. """
+  # Calcula e retorna um dicionário com métricas agregadas por quatro dimensões:
+  # mês, produto, categoria e região. Usa .groupby() + .agg() com nomeação explícita de colunas:
+  # nova_coluna=("coluna_origem", "função") Isso permite criar múltiplas agregações em uma única chamada
+  # e nomear cada resultado diretamente, sem precisar renomear depois. """
 
   metricas = {}
   # --- Receita e volume por mês ---
@@ -333,6 +342,7 @@ def segmentar_clientes ( df ):
   # "Senão, se g >= 75000 e g <= 100000 → 'Prata'"
   # "Senão, se g < 50000 → 'Bronze'"
   # "Senão → 'Indefinido' (para valores entre 50.000 e 75.000, ou igual a 50.000)"
+  
   clientes_df[ "segmento" ] = clientes_df[ "total_gasto" ].apply(
       lambda g: "Ouro" if g > 100000
       else ("Prata" if (g >= 75000 and g <= 100000)
@@ -364,13 +374,14 @@ print(media_gasto_por_segmento.to_string(index=False))
 #- funções NumPy ( mean , std , median , percentile , sum , etc.)
 
 def calcular_estatisticas_numpy ( df ):
-  #""" Usa NumPy diretamente sobre arrays para calcular estatísticas de receita. Demonstra três conceitos:
-   #1. Operações vetorizadas
-   #2. Broadcasting (operação escalar aplicada a todo o array de uma vez)
-   #3. Boolean indexing (filtrar array com máscara booleana) """
-   # .to_numpy() converte a Series do Pandas em um array NumPy puro.
-   # Isso é necessário para usar funções do NumPy diretamente e demonstrar
-   # que sabemos trabalhar com arrays além do DataFrame.
+  #  Usa NumPy diretamente sobre arrays para calcular estatísticas de receita. 
+  #  Demonstra três conceitos:
+   # 1. Operações vetorizadas
+   # 2. Broadcasting (operação escalar aplicada a todo o array de uma vez)
+   # 3. Boolean indexing (filtrar array com máscara booleana) 
+   #  .to_numpy() converte a Series do Pandas em um array NumPy puro.
+   #  Isso é necessário para usar funções do NumPy diretamente e demonstrar
+   #  que sabemos trabalhar com arrays além do DataFrame.
   receitas = df[ "receita_total" ].to_numpy()
 
 # --- Estatísticas descritivas (operações vetorizadas) ---
@@ -396,6 +407,7 @@ def calcular_estatisticas_numpy ( df ):
   stats[ "acima_da_media" ] = acima_da_media
 
 # Exibição — formato separado para inteiro evitar "12.00"
+  
   print ( "\n=== ESTATÍSTICAS COM NUMPY ===" )
   for k, v in stats.items():
     if k == "acima_da_media" :
@@ -417,7 +429,7 @@ import seaborn as sns
 import os
 
 def gerar_visualizacoes ( df , metricas , output_dir = "outputs/graficos" ):
-  #""" Gera e exporta 3 gráficos informativos em PNG:
+  #   Gera e exporta 3 gráficos informativos em PNG:
   #1. Linha — receita total por mês (tendência ao longo do tempo)
   #2. Barras — top 5 produtos por receita (ranking)
   #3. Boxplot — distribuição de receita por região (dispersão e outliers)
@@ -486,6 +498,8 @@ def gerar_visualizacoes ( df , metricas , output_dir = "outputs/graficos" ):
   plt.close()
   print ( f"4 gráficos salvos em: {output_dir} " )
 
+
+
 gerar_visualizacoes(df, metricas)
 
 #RF10 – Organizar o Código em Funções Reutilizáveis
@@ -514,8 +528,8 @@ def aplicar_transformacao(df, coluna, funcao):
     return df
 
 _demo = aplicar_transformacao(df, "receita_total", lambda x: "Alto" if x > 2000 else "Normal")
-_demo[["receita_total","receita_total_transformado"]].head()
-
+#_demo[["receita_total","receita_total_transformado"]].head()
+print(_demo[["receita_total","receita_total_transformado"]].head())
 #RF11 – Ler e Escrever Arquivos (CSV e JSON)
 
 import json
@@ -526,9 +540,11 @@ def exportar_resultados ( metricas , clientes , stats ):
   #para confirmar que o arquivo foi gravado corretamente — demonstrando leitura e escrita de JSON no mesmo fluxo. """
 
   os.makedirs( "outputs" , exist_ok= True )
+  
   # --- Exportação CSV ---
   # encoding="utf-8-sig" adiciona um BOM (Byte Order Mark) ao arquivo.
   # Isso garante que o Excel abra o CSV com acentos corretamente;
+ 
   metricas[ "por_mes" ].to_csv( "outputs/metricas_por_mes.csv" , index= False , encoding= "utf-8-sig" )
   print ( "CSV exportado: outputs/metricas_por_mes.csv" )
   clientes.to_csv( "outputs/segmentacao_clientes.csv" , index= False , encoding= "utf-8-sig" )
@@ -548,6 +564,7 @@ print ( "Dataset final salvo em: data/final/vendas_final.csv" )
   # ensure_ascii=False permite gravar acentos como caracteres reais (ã, é)
   # round(float(v), 2) converte para float antes de arredondar,
   # evitando comportamento inesperado com o campo 'acima_da_media' (int).
+
 stats_serializaveis = {k: round ( float (v), 2 ) for k, v in stats.items()}
 caminho_json = "outputs/estatisticas_gerais.json"
 with open (caminho_json, "w" , encoding= "utf-8" ) as f: json.dump(stats_serializaveis, f, indent= 2 , ensure_ascii= False )
