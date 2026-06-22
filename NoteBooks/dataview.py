@@ -340,7 +340,7 @@ def segmentar_clientes ( df ):
   # Lambda com ternário aninhado — como ler:
   # "Se g > 100000 → 'Ouro'"
   # "Senão, se g >= 75000 e g <= 100000 → 'Prata'"
-  # "Senão, se g < 50000 → 'Bronze'"
+  # "Senão, se g < 75000 → 'Bronze'"
   # "Senão → 'Indefinido' (para valores entre 50.000 e 75.000, ou igual a 50.000)"
   
   clientes_df[ "segmento" ] = clientes_df[ "total_gasto" ].apply(
