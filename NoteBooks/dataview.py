@@ -321,14 +321,14 @@ metricas = calcular_metricas(df)
 
  #Critério de segmentação.
 
-#1.   Bronze: Abaixo de R$ 50.000
+#1.   Bronze: Abaixo de R$ 75.000
 #2.   Plata: R$ 75.000 a R$ 100.000
 #3.   Ouro: Acima de R$ 100.000
 
 def segmentar_clientes ( df ):
   #""" Agrupa os dados por cliente, calcula o gasto total de cada um e classifica
   #em Bronze / Prata / Ouro conforme os limites abaixo:
-  #< R$ 50.000 → Bronze
+  #< R$ 75.000 → Bronze
   #R$ 75.000–R$ 100.000 → Prata
   #> R$ 100.000 → Ouro
   #Demonstra o uso de uma função lambda com condicional encadeado — equivalente a um if/elif/else em uma única expressão."""
